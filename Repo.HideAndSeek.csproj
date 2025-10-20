@@ -1,0 +1,84 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Allow an optional local props file to set REPO_DIR / PluginsDir without committing secrets -->
+  <Import Project="Repo.Settings.props" Condition="Exists('Repo.Settings.props')" />
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>Repo.HideAndSeek</AssemblyName>
+    <RootNamespace>Repo.HideAndSeek</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <Platforms>AnyCPU</Platforms>
+    <OutputType>Library</OutputType>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <DebugType>portable</DebugType>
+    <Optimize>true</Optimize>
+
+    <!-- If PluginsDir isn't set by Repo.Settings.props or env var, default it from REPO_DIR -->
+    <PluginsDir Condition="'$(PluginsDir)' == '' and '$(REPO_DIR)' != ''">$(REPO_DIR)\BepInEx\plugins</PluginsDir>
+  </PropertyGroup>
+
+  <!-- Friendly error if REPO_DIR is not provided by env var or Repo.Settings.props -->
+  <Target Name="CheckRepoDir" BeforeTargets="ResolveReferences">
+    <Error Text="REPO_DIR is not set. Create Repo.Settings.props (see README) or set a Windows user env var REPO_DIR to your REPO install path."
+           Condition="'$(REPO_DIR)' == ''" />
+  </Target>
+
+  <ItemGroup>
+    <!-- Game assemblies -->
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(REPO_DIR)\REPO_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+
+    <!-- BepInEx / Harmony shipped with the game install -->
+    <Reference Include="BepInEx">
+      <HintPath>$(REPO_DIR)\BepInEx\core\BepInEx.dll</HintPath>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(REPO_DIR)\BepInEx\core\0Harmony.dll</HintPath>
+    </Reference>
+
+    <!-- Photon bits (use the ones that ship with the game to match versions) -->
+    <Reference Include="Photon3Unity3D">
+      <HintPath>$(REPO_DIR)\REPO_Data\Managed\Photon3Unity3D.dll</HintPath>
+    </Reference>
+    <Reference Include="PhotonChat">
+      <HintPath>$(REPO_DIR)\REPO_Data\Managed\PhotonChat.dll</HintPath>
+    </Reference>
+    <Reference Include="PhotonRealtime">
+      <HintPath>$(REPO_DIR)\REPO_Data\Managed\PhotonRealtime.dll</HintPath>
+    </Reference>
+    <Reference Include="PhotonUnityNetworking">
+      <HintPath>$(REPO_DIR)\REPO_Data\Managed\PhotonUnityNetworking.dll</HintPath>
+    </Reference>
+
+    <!-- UnityEngine modules -->
+    <Reference Include="UnityEngine">
+      <HintPath>$(REPO_DIR)\REPO_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(REPO_DIR)\REPO_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>$(REPO_DIR)\REPO_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(REPO_DIR)\REPO_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(REPO_DIR)\REPO_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>$(REPO_DIR)\REPO_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>$(REPO_DIR)\REPO_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <!-- If PluginsDir is set, deploy the built DLL there -->
+    <Message Text="Copying $(TargetFileName) to $(PluginsDir)" Importance="high" Condition="'$(PluginsDir)' != ''" />
+    <Exec Command="xcopy /Y /I &quot;$(TargetPath)&quot; &quot;$(PluginsDir)\&quot;" Condition="'$(PluginsDir)' != ''" />
+  </Target>
+</Project>

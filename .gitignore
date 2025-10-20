@@ -1,0 +1,7 @@
+﻿# Local machine paths for MSBuild
+Repo.Settings.props
+
+# VS / build artifacts (if not already present)
+bin/
+obj/
+.vs/

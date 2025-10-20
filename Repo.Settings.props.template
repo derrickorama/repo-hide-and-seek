@@ -1,0 +1,9 @@
+﻿<Project>
+  <PropertyGroup>
+    <!-- Point this to YOUR local install of REPO -->
+    <REPO_DIR>C:\Apps\Steam\steamapps\common\REPO</REPO_DIR>
+
+    <!-- Optional: override plugin deploy directory -->
+    <PluginsDir>$(REPO_DIR)\BepInEx\plugins</PluginsDir>
+  </PropertyGroup>
+</Project>
