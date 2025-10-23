@@ -4,7 +4,7 @@
 
 ### Prerequisites
 
-#### 1) Add your install paths
+#### 1) Add a `Repo.Settings.props.template` file at the root of the project with paths to your install + plugin directory:
 
 ```
 <Project>
